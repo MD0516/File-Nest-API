@@ -1,6 +1,6 @@
 const express = require('express')
 const multer = require('multer')
-const { exec } = require('child_process')
+const { execFile } = require('child_process')
 const path = require('path')
 const fs = require('fs')
 const { error } = require('console')
@@ -25,18 +25,15 @@ app.post('/convert/pdf-to-word', upload.single('file'), (req, res) => {
     }
     const outputPath = path.join(__dirname, 'converted', outputFileName);
 
-    const command = `python pdf-to-docx.py "${pdfPath}" "${outputPath}"`;
 
-    exec(command, (error, stdout, stderr) => {
+    execFile('python3', ['pdf-to-docx.py', pdfPath, outputPath], (error, stdout, stderr) => {
         if (error) {
             console.error(`Error: ${error.message}`)
             return res.status(500).json({ message: 'conversion Failed'})
         }
 
-        res.download(outputPath, 'converted.docx', (err) => {
-            if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
-            if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
-        })
+        const downloadURL = `https://file-nest-api.onrender.com/converted/${outputFileName}`;
+        res.status(200).json({ downloadURL });
 
         if (stderr) {
             console.error(`stderr: ${stderr}`);
@@ -44,6 +41,8 @@ app.post('/convert/pdf-to-word', upload.single('file'), (req, res) => {
         }
     });
 });
+
+app.use('/converted', express.static(path.join(__dirname, 'converted')));
 
 app.listen(3000, () => {
     console.log('Server is running on Port 3000')
