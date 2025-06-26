@@ -19,6 +19,10 @@ app.post('/convert/pdf-to-word', upload.single('file'), (req, res) => {
     const pdfPath = req.file.path;
     const originalName = path.parse(req.file.originalname).name;
     const outputFileName = originalName + '.docx';
+    const outputDir = path.join(__dirname, 'converted');
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir);    
+    }
     const outputPath = path.join(__dirname, 'converted', outputFileName);
 
     const command = `python pdf-to-docx.py "${pdfPath}" "${outputPath}"`;
@@ -30,9 +34,14 @@ app.post('/convert/pdf-to-word', upload.single('file'), (req, res) => {
         }
 
         res.download(outputPath, 'converted.docx', (err) => {
-            fs.unlinkSync(pdfPath);
-            fs.unlinkSync(outputPath);
+            if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
+            if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
         })
+
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return res.status(500).json({ message: 'Conversion failed', error: stderr });
+        }
     });
 });
 
