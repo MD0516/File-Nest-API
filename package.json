@@ -1,0 +1,24 @@
+{
+  "name": "file-conversion-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "imagemin": "^9.0.1",
+    "imagemin-mozjpeg": "^10.0.0",
+    "imagemin-pngquant": "^10.0.0",
+    "multer": "^2.0.1",
+    "nodemon": "^3.1.10",
+    "pdf-lib": "^1.17.1",
+    "sharp": "^0.34.2"
+  }
+}
